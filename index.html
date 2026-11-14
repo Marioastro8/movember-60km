@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Reto 60 KM de Movember: registra tus kilómetros corriendo o caminando, sincroniza con Strava y comparte tu progreso." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <title>MOVEMBER — Reto 60 KM</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 45'%3E%3Crect width='120' height='45' rx='8' fill='%23ffffff'/%3E%3Cpath d='M60 15C54 4 44 2 34 5C23 8 17 24 9 23C6 22.5 4.5 18 3 13C1.5 22 6 37 21 41C36 45 51 39 60 28C69 39 84 45 99 41C114 37 118.5 22 117 13C115.5 18 114 22.5 111 23C103 24 97 8 86 5C76 2 66 4 60 15Z' fill='%230a0a0a'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <!-- Top Editorial Bar -->
+    <header class="site-header">
+      <div class="brand">
+        <svg class="mustache-icon" viewBox="0 0 120 45" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M60 15C54 4 44 2 34 5C23 8 17 24 9 23C6 22.5 4.5 18 3 13C1.5 22 6 37 21 41C36 45 51 39 60 28C69 39 84 45 99 41C114 37 118.5 22 117 13C115.5 18 114 22.5 111 23C103 24 97 8 86 5C76 2 66 4 60 15Z" fill="currentColor"/>
+        </svg>
+        <div class="brand-text">
+          <span class="brand-kicker" id="brandEditionKicker">MOVE FOR MOVEMBER 2026</span>
+          <h1 class="brand-title" data-i18n="brandTitle">RETO 60 KM</h1>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <!-- Auth Trigger Button (Replaces old profile selector) -->
+        <button type="button" id="authHeaderBtn" class="auth-header-btn" aria-label="Iniciar sesión o ver cuenta">
+          <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span id="authHeaderBtnLabel" data-i18n="signInBtn">Iniciar sesión</span>
+        </button>
+
+        <div class="header-toggles">
+          <!-- Monochrome Language Switcher (ES / EN Flags) -->
+          <button type="button" id="langToggleBtn" class="lang-btn" title="Cambiar idioma (ES / EN)" aria-label="Cambiar idioma entre español e inglés">
+            <span class="lang-option" id="langOptEs" data-lang-opt="es">
+              <svg class="flag-icon" viewBox="0 0 24 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect x="0.75" y="0.75" width="22.5" height="14.5" stroke="currentColor" stroke-width="1.5"/>
+                <rect x="1.5" y="1.5" width="21" height="3.2" fill="currentColor"/>
+                <rect x="1.5" y="11.3" width="21" height="3.2" fill="currentColor"/>
+                <rect x="6" y="6.2" width="2.6" height="3.6" stroke="currentColor" stroke-width="1.2"/>
+                <line x1="7.3" y1="5.2" x2="7.3" y2="6.2" stroke="currentColor" stroke-width="1.2"/>
+              </svg>
+              <span>ES</span>
+            </span>
+            <span class="lang-divider">/</span>
+            <span class="lang-option" id="langOptEn" data-lang-opt="en">
+              <svg class="flag-icon" viewBox="0 0 24 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect x="0.75" y="0.75" width="22.5" height="14.5" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M1.5 1.5L22.5 14.5M22.5 1.5L1.5 14.5" stroke="currentColor" stroke-width="1.6"/>
+                <path d="M12 1V15M1 8H23" stroke="currentColor" stroke-width="2.8"/>
+              </svg>
+              <span>EN</span>
+            </span>
+          </button>
+
+          <button type="button" id="invertThemeBtn" class="theme-btn" title="Alternar blanco/negro" aria-label="Invertir contraste blanco y negro">
+            <span class="theme-dot"></span>
+            <span id="themeBtnLabel">B / N</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Hero & Progress Section -->
+    <main class="main-content">
+      <section class="hero-card" aria-labelledby="progress-heading">
+        <div class="hero-top">
+          <div>
+            <p class="eyebrow" id="editionEyebrow">PROGRESO ACUMULADO · NOVIEMBRE 2026</p>
+            <h2 id="progress-heading" class="km-readout">
+              <span id="currentKmValue">0</span>
+              <span class="km-target">/ 60 km</span>
+            </h2>
+          </div>
+
+          <div class="hero-cta-wrap">
+            <button type="button" id="openShareModalBtn" class="btn-secondary" title="Generar tarjeta descargable de tu progreso">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="0"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+              <span data-i18n="shareCardBtn">Tarjeta de progreso</span>
+            </button>
+
+            <button type="button" id="openModalBtn" class="btn-primary">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span data-i18n="addActivityBtn">Añadir actividad</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Status Banner / Remaining KM -->
+        <div class="status-strip">
+          <span id="remainingKmText" class="status-pill">Faltan 60 km para completar el reto</span>
+          <button type="button" class="storage-indicator storage-indicator-btn" id="storageIndicatorBtn" title="Haz clic para iniciar sesión y sincronizar entre dispositivos">
+            <span class="pulse-dot" id="storagePulseDot"></span>
+            <span id="storageIndicatorText" data-i18n="savedLocallyHint">Modo local · Inicia sesión para sincronizar</span>
+          </button>
+        </div>
+
+        <!-- 60 KM Progress Bar (Measured strictly in KM, not %) -->
+        <div class="progress-wrapper">
+          <div
+            class="progress-track"
+            id="progressTrack"
+            role="progressbar"
+            aria-valuemin="0"
+            aria-valuemax="60"
+            aria-valuenow="0"
+            aria-label="Progreso en kilómetros hasta 60 km"
+          >
+            <div class="progress-fill-run" id="progressFillRun" style="width: 0%"></div>
+            <div class="progress-fill-walk" id="progressFillWalk" style="width: 0%"></div>
+            <!-- Milestone tick lines inside track -->
+            <div class="track-ticks" aria-hidden="true">
+              <span class="tick" style="left: 25%"></span>
+              <span class="tick" style="left: 50%"></span>
+              <span class="tick" style="left: 75%"></span>
+            </div>
+          </div>
+
+          <!-- Scale labels in KM -->
+          <div class="progress-scale" aria-hidden="true">
+            <span>0 km</span>
+            <span>15 km</span>
+            <span>30 km</span>
+            <span>45 km</span>
+            <span>60 km</span>
+          </div>
+        </div>
+
+        <!-- Legend & Breakdown in KM -->
+        <div class="progress-legend">
+          <div class="legend-item">
+            <span class="swatch swatch-run"></span>
+            <span class="legend-label" data-i18n="legendRun">Correr:</span>
+            <strong id="runKmTotal">0 km</strong>
+          </div>
+          <div class="legend-item">
+            <span class="swatch swatch-walk"></span>
+            <span class="legend-label" data-i18n="legendWalk">Caminar:</span>
+            <strong id="walkKmTotal">0 km</strong>
+          </div>
+          <div class="legend-item legend-right">
+            <span class="legend-label" data-i18n="legendActivities">Actividades:</span>
+            <strong id="activitiesCount">0</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- Strava Sync Banner (Below hero / where activities are added) -->
+      <section class="strava-banner" aria-label="Sincronización automática con Strava">
+        <div class="strava-banner-left">
+          <div class="strava-logo-box" aria-hidden="true">
+            <!-- Monochrome Strava Chevron Emblem -->
+            <svg class="strava-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/>
+            </svg>
+          </div>
+          <div class="strava-banner-text">
+            <div class="strava-title-row">
+              <h3 class="strava-title" data-i18n="stravaBannerTitle">CONECTAR CON STRAVA</h3>
+              <span class="strava-edition-tag" id="stravaEditionTag">NOVIEMBRE 2026</span>
+            </div>
+            <p class="strava-desc" id="stravaBannerDesc" data-i18n="stravaBannerDesc">
+              Importa automáticamente tus carreras, caminatas, trail running y rutas de senderismo de noviembre con sus kilómetros y fechas.
+            </p>
+          </div>
+        </div>
+
+        <div class="strava-banner-right">
+          <button type="button" id="stravaSyncBtn" class="btn-outline strava-sync-btn">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/>
+            </svg>
+            <span id="stravaSyncBtnLabel" data-i18n="stravaConnectBtn">Conectar Strava</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Info + Breakdown Grid -->
+      <section class="stats-grid" aria-label="Resumen por deporte">
+        <article class="stat-box">
+          <div class="stat-header">
+            <span class="sport-badge sport-run">
+              <svg class="icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="15" cy="4" r="2"></circle>
+                <path d="M10.5 9.5L7 11l-1.5 3.5"></path>
+                <path d="M10.5 9.5l4 2.5 3.5-1"></path>
+                <path d="M12.5 14.5L9.5 17 5 18"></path>
+                <path d="M14.5 12l-2 2.5 3.5 3.5 1 4"></path>
+              </svg>
+              <span data-i18n="sportRunUpper">CORRER</span>
+            </span>
+            <button type="button" class="quick-sport-btn" data-quick-sport="Correr" data-i18n="quickLogRun">+ Registrar carrera</button>
+          </div>
+          <p class="stat-big" id="statRunKm">0 km</p>
+          <p class="stat-meta" id="statRunSessions">0 sesiones registradas</p>
+        </article>
+
+        <article class="stat-box">
+          <div class="stat-header">
+            <span class="sport-badge sport-walk">
+              <svg class="icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="13" cy="4" r="2"></circle>
+                <path d="M10 10.5L8 13l1 3"></path>
+                <path d="M12 9l4 3 2 1"></path>
+                <path d="M12 9l-1 5-3 6"></path>
+                <path d="M11 14l3.5 3 1.5 3"></path>
+              </svg>
+              <span data-i18n="sportWalkUpper">CAMINAR</span>
+            </span>
+            <button type="button" class="quick-sport-btn" data-quick-sport="Caminar" data-i18n="quickLogWalk">+ Registrar caminata</button>
+          </div>
+          <p class="stat-big" id="statWalkKm">0 km</p>
+          <p class="stat-meta" id="statWalkSessions">0 sesiones registradas</p>
+        </article>
+      </section>
+
+      <!-- Activity Log Section -->
+      <section class="history-section" aria-labelledby="history-heading">
+        <div class="section-header">
+          <div>
+            <h3 id="history-heading" class="section-title" data-i18n="historyTitle">HISTORIAL DE ACTIVIDADES</h3>
+            <p class="section-subtitle" id="historySubtitle">Cada sesión suma directamente a tu barra de 60 km</p>
+          </div>
+
+          <div class="history-actions">
+            <div class="filter-pills" role="group" aria-label="Filtrar por deporte">
+              <button type="button" class="filter-pill active" data-filter="all" data-i18n="filterAll">Todas</button>
+              <button type="button" class="filter-pill" data-filter="Correr" data-i18n="sportRun">Correr</button>
+              <button type="button" class="filter-pill" data-filter="Caminar" data-i18n="sportWalk">Caminar</button>
+            </div>
+            <button type="button" id="resetAllBtn" class="btn-ghost-danger" data-i18n="resetBtn">
+              Reiniciar
+            </button>
+          </div>
+        </div>
+
+        <div id="emptyState" class="empty-state">
+          <div class="empty-icon" aria-hidden="true">60 KM</div>
+          <p class="empty-title" data-i18n="emptyTitle">Aún no has registrado kilómetros</p>
+          <p class="empty-desc" data-i18n="emptyDesc">
+            Pulsa en «Añadir actividad» o conecta tu cuenta de Strava para sumar tus kilómetros de noviembre.
+          </p>
+          <div class="empty-actions">
+            <button type="button" id="emptyAddBtn" class="btn-primary" data-i18n="emptyAddBtn">Añadir primera actividad</button>
+            <button type="button" id="emptyStravaBtn" class="btn-outline" data-i18n="stravaConnectBtn">Conectar Strava</button>
+          </div>
+        </div>
+
+        <ul id="activityList" class="activity-list" aria-live="polite"></ul>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <p>
+        <strong data-i18n="footerWhyStrong">POR QUÉ 60 KM:</strong>
+        <span data-i18n="footerWhyBody">60 kilómetros por los 60 hombres que perdemos por suicidio cada hora en el mundo. Muévete por la salud masculina.</span>
+      </p>
+    </footer>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- Modal / Pantalla de Inicio de Sesión (Google, Strava, Correo)         -->
+  <!-- ===================================================================== -->
+  <div class="modal-backdrop" id="authModal" aria-hidden="true">
+    <div class="modal-dialog modal-auth" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+      <div class="modal-header">
+        <div>
+          <span class="modal-kicker" data-i18n="authModalKicker">SINCRONIZACIÓN MULTIDISPOSITIVO</span>
+          <h2 id="authModalTitle" class="modal-title" data-i18n="authModalTitle">Iniciar sesión</h2>
+        </div>
+        <button type="button" id="closeAuthModalBtn" class="modal-close" aria-label="Cerrar ventana">✕</button>
+      </div>
+
+      <!-- Guest / Login View -->
+      <div id="authGuestView" class="auth-view">
+        <p class="auth-intro" data-i18n="authIntroText">
+          Accede a tu cuenta para ver y actualizar tu barra de 60 km desde el móvil, tablet u ordenador. Tus actividades locales se conservarán automáticamente.
+        </p>
+
+        <!-- Social Providers: Google & Strava -->
+        <div class="auth-providers">
+          <button type="button" id="loginGoogleBtn" class="auth-provider-btn">
+            <!-- Monochrome Google G SVG -->
+            <svg class="provider-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z"/>
+            </svg>
+            <span data-i18n="continueWithGoogle">Continuar con Google</span>
+          </button>
+
+          <button type="button" id="loginStravaBtn" class="auth-provider-btn auth-provider-strava">
+            <!-- Monochrome Strava SVG -->
+            <svg class="provider-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/>
+            </svg>
+            <span data-i18n="continueWithStrava">Continuar con Strava</span>
+          </button>
+        </div>
+
+        <div class="auth-divider">
+          <span data-i18n="authOrEmail">O CON TU CORREO ELECTRÓNICO</span>
+        </div>
+
+        <!-- Email Auth Form -->
+        <form id="emailAuthForm" class="auth-email-form" novalidate>
+          <div class="form-group">
+            <label for="authEmailInput" class="form-label" data-i18n="emailLabel">Correo electrónico</label>
+            <input
+              type="email"
+              id="authEmailInput"
+              placeholder="tu@correo.com"
+              required
+              autocomplete="email"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="authPasswordInput" class="form-label" data-i18n="passwordLabel">Contraseña</label>
+            <input
+              type="password"
+              id="authPasswordInput"
+              placeholder="Mínimo 6 caracteres"
+              required
+              minlength="6"
+              autocomplete="current-password"
+            />
+          </div>
+
+          <p id="authFeedbackMsg" class="auth-feedback" role="alert" hidden></p>
+
+          <div class="auth-email-actions">
+            <button type="submit" id="emailSignInBtn" class="btn-primary" data-i18n="emailSignInBtn">
+              Entrar / Registrarse con correo
+            </button>
+          </div>
+        </form>
+
+        <div class="auth-guest-footer">
+          <button type="button" id="continueAsGuestBtn" class="btn-link" data-i18n="continueGuestBtn">
+            Seguir sin cuenta por ahora (guardado solo en este navegador)
+          </button>
+        </div>
+      </div>
+
+      <!-- Logged-in Account View -->
+      <div id="authAccountView" class="auth-view" hidden>
+        <div class="account-summary-box">
+          <p class="eyebrow" data-i18n="connectedAccountLabel">CUENTA CONECTADA</p>
+          <p class="account-identity" id="accountIdentityText">usuario@correo.com</p>
+          <p class="account-provider-tag" id="accountProviderTag">GOOGLE</p>
+        </div>
+
+        <div class="account-strava-box">
+          <div>
+            <strong data-i18n="stravaStatusTitle">Conexión con Strava</strong>
+            <p class="form-help" id="accountStravaStatusText" data-i18n="stravaNotConnectedYet">
+              No vinculada todavía
+            </p>
+          </div>
+          <button type="button" id="accountStravaSyncBtn" class="btn-outline btn-sm" data-i18n="stravaConnectBtn">
+            Conectar Strava
+          </button>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="signOutBtn" class="btn-secondary" data-i18n="signOutBtn">Cerrar sesión</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- Modal: Añadir / Editar Actividad                                      -->
+  <!-- ===================================================================== -->
+  <div class="modal-backdrop" id="activityModal" aria-hidden="true">
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <div>
+          <span class="modal-kicker" id="modalKicker">NUEVO REGISTRO</span>
+          <h2 id="modalTitle" class="modal-title">Añadir actividad</h2>
+        </div>
+        <button type="button" id="closeModalBtn" class="modal-close" aria-label="Cerrar ventana">✕</button>
+      </div>
+
+      <form id="activityForm" novalidate>
+        <!-- 1. Deporte Selector (Correr / Caminar) -->
+        <fieldset class="form-group">
+          <legend class="form-label" data-i18n="formSportLabel">1. Tipo de deporte</legend>
+          <div class="sport-selector">
+            <label class="sport-option">
+              <input type="radio" name="sportType" value="Correr" checked />
+              <span class="sport-card">
+                <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="15" cy="4" r="2"></circle>
+                  <path d="M10.5 9.5L7 11l-1.5 3.5"></path>
+                  <path d="M10.5 9.5l4 2.5 3.5-1"></path>
+                  <path d="M12.5 14.5L9.5 17 5 18"></path>
+                  <path d="M14.5 12l-2 2.5 3.5 3.5 1 4"></path>
+                </svg>
+                <span class="sport-name" data-i18n="sportRun">Correr</span>
+                <span class="sport-pattern-tag" data-i18n="patternSolid">Trazo sólido</span>
+              </span>
+            </label>
+
+            <label class="sport-option">
+              <input type="radio" name="sportType" value="Caminar" />
+              <span class="sport-card">
+                <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="13" cy="4" r="2"></circle>
+                  <path d="M10 10.5L8 13l1 3"></path>
+                  <path d="M12 9l4 3 2 1"></path>
+                  <path d="M12 9l-1 5-3 6"></path>
+                  <path d="M11 14l3.5 3 1.5 3"></path>
+                </svg>
+                <span class="sport-name" data-i18n="sportWalk">Caminar</span>
+                <span class="sport-pattern-tag" data-i18n="patternStriped">Trazo rayado</span>
+              </span>
+            </label>
+          </div>
+        </fieldset>
+
+        <!-- 2. Kilómetros hechos -->
+        <div class="form-group">
+          <label for="kmInput" class="form-label" data-i18n="formKmLabel">2. Kilómetros hechos</label>
+          <div class="km-input-wrap">
+            <input
+              type="number"
+              id="kmInput"
+              name="km"
+              min="0.1"
+              max="200"
+              step="0.1"
+              placeholder="Ej. 5.5"
+              required
+              inputmode="decimal"
+            />
+            <span class="km-unit-suffix">KM</span>
+          </div>
+
+          <div class="preset-chips" aria-label="Sumar kilómetros rápidos">
+            <button type="button" class="chip-btn" data-km="2">2 km</button>
+            <button type="button" class="chip-btn" data-km="5">5 km</button>
+            <button type="button" class="chip-btn" data-km="8">8 km</button>
+            <button type="button" class="chip-btn" data-km="10">10 km</button>
+            <button type="button" class="chip-btn" data-km="15">15 km</button>
+          </div>
+          <p id="formError" class="form-error" role="alert" hidden></p>
+        </div>
+
+        <!-- 3. Fecha de la actividad -->
+        <div class="form-group">
+          <div class="label-row">
+            <label for="dateInput" class="form-label" data-i18n="formDateLabel">3. Fecha de la actividad</label>
+            <div class="date-quick-btns">
+              <button type="button" class="date-chip-btn" id="dateTodayBtn" data-i18n="todayBtn">Hoy</button>
+              <button type="button" class="date-chip-btn" id="dateYesterdayBtn" data-i18n="yesterdayBtn">Ayer</button>
+            </div>
+          </div>
+          <input type="date" id="dateInput" name="date" required />
+        </div>
+
+        <!-- 4. Nota opcional -->
+        <div class="form-group">
+          <label for="noteInput" class="form-label">
+            <span data-i18n="formNoteLabel">4. Nota opcional</span>
+            <span class="label-optional" data-i18n="formNoteHint">(ruta, tiempo, sensaciones)</span>
+          </label>
+          <input
+            type="text"
+            id="noteInput"
+            name="note"
+            maxlength="80"
+            placeholder="Ej. Vuelta por el parque al atardecer"
+          />
+        </div>
+
+        <!-- Preview of impact on the 60km bar -->
+        <div class="modal-preview" id="modalPreview">
+          <span data-i18n="previewLabel">Nuevo total tras guardar:</span>
+          <strong id="previewNewTotal">0 / 60 km</strong>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="cancelModalBtn" class="btn-secondary" data-i18n="cancelBtn">Cancelar</button>
+          <button type="submit" id="submitActivityBtn" class="btn-primary btn-submit" data-i18n="saveKmBtn">Guardar kilómetros</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- Modal: Tarjeta Descargable / Compartible                              -->
+  <!-- ===================================================================== -->
+  <div class="modal-backdrop" id="shareModal" aria-hidden="true">
+    <div class="modal-dialog modal-share" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
+      <div class="modal-header">
+        <div>
+          <span class="modal-kicker" data-i18n="shareModalKicker">COMPARTIR RETO MOVEMBER</span>
+          <h2 id="shareModalTitle" class="modal-title" data-i18n="shareModalTitle">Tarjeta de progreso</h2>
+        </div>
+        <button type="button" id="closeShareModalBtn" class="modal-close" aria-label="Cerrar ventana">✕</button>
+      </div>
+
+      <div class="share-controls-bar">
+        <div class="share-control-group">
+          <span class="share-control-label" data-i18n="cardFormatLabel">Formato:</span>
+          <div class="filter-pills">
+            <button type="button" class="filter-pill active" data-card-format="story" data-i18n="formatStory">Vertical (Stories)</button>
+            <button type="button" class="filter-pill" data-card-format="square" data-i18n="formatSquare">Cuadrado (Post)</button>
+          </div>
+        </div>
+
+        <div class="share-control-group">
+          <span class="share-control-label" data-i18n="cardThemeLabel">Fondo:</span>
+          <div class="filter-pills">
+            <button type="button" class="filter-pill active" data-card-theme="light" data-i18n="cardThemeLight">Blanco</button>
+            <button type="button" class="filter-pill" data-card-theme="dark" data-i18n="cardThemeDark">Negro</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="canvas-preview-stage">
+        <canvas id="shareCanvas" width="1080" height="1350" aria-label="Vista previa de tarjeta de progreso"></canvas>
+      </div>
+
+      <p id="shareFeedback" class="share-feedback" hidden></p>
+
+      <div class="modal-footer share-footer">
+        <button type="button" id="copyCardBtn" class="btn-secondary">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="0" ry="0"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          <span data-i18n="copyImageBtn">Copiar imagen</span>
+        </button>
+
+        <button type="button" id="downloadCardBtn" class="btn-secondary">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span data-i18n="downloadPngBtn">Descargar PNG</span>
+        </button>
+
+        <button type="button" id="nativeShareCardBtn" class="btn-primary">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+          <span data-i18n="nativeShareBtn">Compartir (Stories / WhatsApp)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK (Auth + Firestore) & Configuración del Proyecto -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
